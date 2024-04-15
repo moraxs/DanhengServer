@@ -1,13 +1,12 @@
-name: .NET
+name: Build and Upload Artifacts
 
 on:
   push:
-    branches: [ "master" ]
-    paths: [ "**.cs" ]
+    branches:
+      - master
   pull_request:
-    branches: [ "master" ]
-    paths: [ "**.cs" ]
-  workflow_dispatch:
+    branches:
+      - master
 
 jobs:
   build:
@@ -16,20 +15,24 @@ jobs:
 
     strategy:
       matrix:
-        os: [windows-latest, ubuntu-latest]
+        os: [windows-latest, ubuntu-latest, ubuntu-latest-arm64]
 
     steps:
     - uses: actions/checkout@v3
+
     - name: Setup .NET
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: 8.0.x
+
     - name: Restore dependencies
       run: dotnet restore
+
     - name: Build
       run: dotnet build --no-restore --configuration Release
-    - name: Upload a Build Artifact
-      uses: actions/upload-artifact@v4.3.1
+
+    - name: Upload Build Artifact
+      uses: actions/upload-artifact@v2
       with:
-        name: DanhengServer
+        name: DanhengServer-${{ matrix.os }}
         path: GameServer/bin/Release/net8.0/
